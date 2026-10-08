@@ -18,8 +18,8 @@ window.SERVICES_DATA = [
     "title": "内装補修",
     "description": "壁穴・ドアなどの部分補修に。気になる箇所の写真からもご相談いただけます。",
     "image": "assets/images/works/placeholders/real-photo.svg",
-    "alt": "壁穴・ドア補修の実際の施工写真は掲載準備中",
-    "caption": "実際の補修写真を掲載予定"
+    "alt": "壁穴・ドアなどの内装補修のご相談",
+    "caption": "気になる箇所の写真からもご相談いただけます。"
   },
   {
     "title": "原状回復",
