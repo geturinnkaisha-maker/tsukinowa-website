@@ -93,3 +93,11 @@
 - 首页、Contact 固定 QR 槽位；路径 assets/images/line/line-qr.png。上传真实二维码后 lineQrReady 设 true，上传前为 false 避免缺图请求。加载失败仍显示「LINE QR準備中」。空 lineUrl 只指向真实联系页，不生成外部假链接。
 - Contact 顺序 LINE / 电话 / 邮件。免费阶段表单标题下提前说明送信準備中，继续禁用按钮，保留输入与本机照片预览；不发送请求、不保存输入、不显示成功。未来正式服务器接入后，点击送信才将完整内容发到公司邮箱。
 - 不新增口コミ模块，不解释评价缺失。仅真实 Google 评价或客户许可反馈可用于未来「お客様の声」。地址、受付时间、周末对应、1,400円/㎡（材工込み）、品牌和 noindex 保持。
+
+## 2026-10-08 未来案例预留（用户最新确认）
+
+- `works-data.js` 统一维护分类候选及注释中的空白案例模板，默认 `published: false`、图片路径空白；只填已确认真实信息，不虚构案例。预留クロス張替え / 壁面補修 / 穴補修 / ドア補修 / CF・床施工 / 原状回復 / その他内装補修。
+- 图片固定 `assets/images/works/real/<case-id>/before.webp`、`after.webp`；`_template/README.md` 仅维护说明，不放假图、不进入前台。
+- 未发布或不完整图片对绝不显示；不显示空白卡、准备中案例卡或无实绩分类。首页最新4条完整真实案例，Works全部；缺图隐藏整条记录。
+- 当前仍为 GitHub Pages，图片用 GitHub Add file > Upload files 上传，上传后再编辑数据，最后才设 published=true。无假上传入口，不启用 Workers/R2/Firebase。
+- 基于现有 PR #1 分支继续；不改 main、不自动 merge、保留 noindex。

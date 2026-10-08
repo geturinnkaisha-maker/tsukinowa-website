@@ -30,6 +30,11 @@ test('new records sort by date, then publication date; missing month uses public
 });
 test('AI, illustration paths, unknown provenance, drafts and duplicate IDs cannot enter Works', () => {
   const good = record('good');
-  const input = [good, good, record('ai', {imageType:'ai'}), record('missing', {imageType:undefined}), record('illustration', {beforeImage:'assets/images/illustrations/services/floor-v3.webp'}), record('wrong-case', {afterImage:good.afterImage}), record('draft', {published:false}), record('../escape')];
+  const input = [good, good, record('ai', {imageType:'ai'}), record('missing', {imageType:undefined}), record('illustration', {beforeImage:'assets/images/illustrations/services/floor-v3.webp'}), record('wrong-case', {afterImage:good.afterImage}), record('draft', {published:false}), record('no-before', {beforeImage:''}), record('no-after', {afterImage:undefined}), record('no-title', {title:' '}), record('no-category', {category:''}), record('../escape')];
   assert.equal(Array.from(select(input), work => work.id).join(','), 'good');
+});
+test('future categories and commented blank template do not create cases or missing image references', () => {
+  assert.deepEqual(Array.from(context.window.WORKS_CATEGORIES), ['クロス張替え','壁面補修','穴補修','ドア補修','CF・床施工','原状回復','その他内装補修']);
+  assert.equal(context.window.WORKS_DATA.length, 4);
+  assert.deepEqual(fs.readdirSync('assets/images/works/real/_template'), ['README.md']);
 });

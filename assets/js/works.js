@@ -9,7 +9,8 @@
   // Explicit provenance AND the case's own real-photo paths are required.
   // This guard prevents accidental mixing; maintainers still verify photo provenance.
   const isPublishedReal = work => work && validId(work.id) && work.published === true &&
-    work.imageType === 'real' && typeof work.title === 'string' && typeof work.category === 'string' &&
+    work.imageType === 'real' && typeof work.title === 'string' && work.title.trim() &&
+    typeof work.category === 'string' && work.category.trim() &&
     work.beforeImage === `assets/images/works/real/${work.id}/before.webp` && work.afterImage === `assets/images/works/real/${work.id}/after.webp`;
   const dateKey = value => {
     if (typeof value !== 'string') return '';
@@ -33,6 +34,21 @@
   let revealCurrent = () => {};
   let activeCategory = '';
   const redraws = [];
+  // Verify both actual images before rendering, so an incomplete case never gets a card.
+  const imageReady = src => new Promise(resolve => {
+    const image = new Image();
+    image.onload = () => resolve(image.naturalWidth > 0 && image.naturalHeight > 0);
+    image.onerror = () => resolve(false);
+    image.src = src;
+  });
+  const completeWorks = async data => {
+    const candidates = publishedWorks(data);
+    const ready = await Promise.all(candidates.map(async work => {
+      const pair = await Promise.all([imageReady(work.beforeImage), imageReady(work.afterImage)]);
+      return pair.every(Boolean);
+    }));
+    return candidates.filter((work, index) => ready[index]);
+  };
   function renderWork(work, preview) {
     const article = node('article', null, 'work');
     article.id = work.id;
@@ -45,8 +61,9 @@
       image.alt = `${work.title} ${label}の実際の施工写真`;
       image.loading = 'lazy';
       image.addEventListener('error', () => {
-        // Remove the incomplete pair: never substitute an illustration or fake After.
-        pair.replaceChildren(node('p', '写真を確認中です。', 'notice'));
+        // Also hide the whole case if a previously verified image becomes unavailable.
+        works = works.filter(item => item.id !== work.id);
+        redraws.forEach(draw => draw());
       }, { once: true });
       image.src = src;
       if (preview) figure.append(image);
@@ -95,7 +112,6 @@
       const visible = preview ? works.slice(0, 4) : works;
       const selected = category ? visible.filter(work => work.category === category) : visible;
       grid.replaceChildren(...selected.map(work => renderWork(work, preview)));
-      if (!selected.length) grid.append(node('p', '施工写真は掲載準備中です。', 'notice'));
     };
     const filters = !preview && document.querySelector('[data-work-filters]');
     const update = () => {
@@ -131,6 +147,8 @@
     }
   });
   // Single data boundary: a future same-origin server can supply this array.
-  works = publishedWorks(window.WORKS_DATA);
-  redraws.forEach(draw => draw()); revealCurrent();
+  if (redraws.length) completeWorks(window.WORKS_DATA).then(complete => {
+    works = complete;
+    redraws.forEach(draw => draw()); revealCurrent();
+  });
 })();

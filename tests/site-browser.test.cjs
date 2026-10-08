@@ -143,6 +143,35 @@ const server = http.createServer((req,res) => {
     assert.deepEqual(await page.locator('[data-works] .work').evaluateAll(items=>items.map(item=>item.id)),['fixture-5','fixture-4','fixture-3','fixture-2']);
     await load('works.html'); assert.equal(await page.locator('[data-works] .work').count(),6);
     await page.getByRole('button',{name:'追加カテゴリ'}).click();assert.equal(await page.locator('[data-works] .work').count(),6);
+    // A failed image hides its entire case and the homepage fills from the next complete case.
+    await page.route('**/works/real/fixture-5/after.webp',route=>route.fulfill({contentType:'image/webp',body:'unavailable-image-fixture'}));
+    await load('index.html');
+    assert.deepEqual(await page.locator('[data-works] .work').evaluateAll(items=>items.map(item=>item.id)),['fixture-4','fixture-3','fixture-2','fixture-1']);
+    await load('works.html');
+    assert.equal(await page.locator('[data-works] .work').count(),5);
+    assert.equal(await page.locator('#fixture-5').count(),0);
+    assert.ok(!/写真を確認中|施工写真は掲載準備中/.test(await page.locator('[data-works]').innerText()));
+    await page.unroute('**/works/real/fixture-5/after.webp');
+    await page.unroute('**/assets/js/works-data.js');
+    // Drafts with absent files, missing Before/After, and blank metadata request no images.
+    await page.route('**/assets/js/works-data.js',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/works-data.js','utf8')+`
+      const base={id:'hidden-fixture',title:'Hidden',category:'穴補修',imageType:'real',published:true,beforeImage:'assets/images/works/real/hidden-fixture/before.webp',afterImage:'assets/images/works/real/hidden-fixture/after.webp'};
+      window.WORKS_DATA.push({...base,published:false},{...base,afterImage:''},{...base,beforeImage:''},{...base,title:' '},{...base,category:''});
+    `}));
+    for (const file of ['index.html','works.html']) {
+      await load(file);
+      assert.equal(await page.locator('[data-works] .work').count(),4);
+      assert.equal(await page.locator('#hidden-fixture').count(),0);
+      assert.ok(!/施工準備中|施工写真は掲載準備中/.test(await page.locator('[data-works]').innerText()));
+    }
+    assert.equal(await page.getByRole('button',{name:'穴補修',exact:true}).count(),0);
+    assert.equal(requests.filter(request=>request.url.includes('hidden-fixture') || request.url.includes('/_template/')).length,0);
+    await page.unroute('**/assets/js/works-data.js');
+    await page.route('**/assets/js/works-data.js',route=>route.fulfill({contentType:'text/javascript',body:'window.WORKS_DATA=[];'}));
+    await load('works.html');
+    assert.equal(await page.locator('[data-works]').innerText(),'');
+    assert.equal(await page.locator('[data-works] .work').count(),0);
+    await page.unroute('**/assets/js/works-data.js');
     await page.route('**/assets/js/services-data.js',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/services-data.js','utf8')+'window.SERVICES_DATA.push({title:"内装デザイン",description:"テスト用追加サービス"});'}));
     await load('index.html');assert.equal(await page.locator('[data-services] .service-row').count(),5);
     await load('contact.html?service=内装デザイン');assert.equal(await page.locator('#service').inputValue(),'内装デザイン');
@@ -150,6 +179,6 @@ const server = http.createServer((req,res) => {
     assert.equal(requests.filter(request=>request.url.includes('/assets/images/line/line-qr.png')).length,0);
     assert.deepEqual(await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length})),{local:0,session:0});
     assert.deepEqual(failures,[]);assert.deepEqual(errors,[]);
-    console.log('PASS: 6 pages × 4 widths, noindex, contacts, LINE placeholders/configuration, photos + no submission, uncropped image ratios, pet correction/deduplication, platform removal, early form notice, works latest 4/all/filter/hash, appended services, no resource errors.');
+    console.log('PASS: 6 pages × 4 widths, noindex, contacts, LINE, full photo ratios, latest 4/all/filter/hash, hidden drafts/incomplete/failed-image cases, no empty cards or future category filters, no resource errors.');
   } finally { await browser.close(); }
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>server.close());
