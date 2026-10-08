@@ -1,8 +1,17 @@
+# 狗咬墙面补齐复查 — 2026-10-08
+
+- 基于 PR #1 head ae7390ddea3dedb4b37c1f8b53069ee3b60d69f8，继续原分支，不改 main、不 merge。
+- 用户此前真实狗咬 Before 和最新补传 After 已替换既有 wallpaper-restoration 照片对，均为1080×1440，完整比例。数据入口未新增记录，7条已发布案例保持，无额外说明。
+- 数据测试4项通过；六页 × 320/390/768/1440px 共24组浏览器检查通过，无404、请求失败、JS异常、横向溢出，noindex保留。完整比例、首页4条/Works7条、筛选与源图打开正常。
+- LINE PNG 与此前版本字节一致，lineQrReady=true、lineUrl为空；首页和Contact在四种尺寸的8张截图均可解码至同一真实LINE地址。
+
+---
+
 # 真实照片与 LINE 检查 — 2026-10-08
 
 - 基于 PR #1 head 3ab965ae7a149da5a21c9a0d82f91058a2620a89，继续 fix/website-content-contact-20261008；不改 main、不 merge。
 - 已处理本轮三组完整真实照片：タイルカーペット張替え / 猫の引っかき傷によるクロス張替え / 網戸張替え。保留完整原图，仅 EXIF 方向校正、等比例最长边1600px缩放、WebP压缩；逐张比例检查通过。三组说明为空；既有宠物墙面也移除说明，无重复宠物记录。
-- 附件仅提供8张：狗咬Before、地毯Before/After、猫抓Before/After、LINE二维码、網戸Before/After。狗咬After未取得，狗咬原有完整照片对暂时保留，本轮Before未与旧图错配；补齐后须继续替换既有wallpaper-restoration照片对。此项未完成。
+- 狗咬墙面 Before 与最新补传 After 已正式补齐，替换既有 wallpaper-restoration/before.webp 与 after.webp；均为1080×1440，完整保留原图比例，只进行方向校正及WebP压缩转换。标题「ペットによる壁面破損の補修」、分类「壁面補修」、说明为空，无重复宠物记录。
 - LINE真实附件900×900 JPEG无损转换PNG，像素及尺寸一致；固定路径 assets/images/line/line-qr.png，lineQrReady=true，lineUrl为空。源图与PNG解码结果一致；首页及Contact在320/390/768/1440px的8张实际页面截图均可解码到相同真实LINE地址。
 - 数据测试4项通过；六页×四尺寸24组浏览器检查通过，无404、资源请求失败、JS异常或横向溢出；noindex保留。首页最新4条/Works全部7条、类别筛选、源图链接、完整图片比例、无说明、缺图/草稿隐藏与二维码失败回退均通过。
 - 当前PR分支已发布标记共7条：猫の引っかき傷によるクロス張替え；網戸張替え；タイルカーペット張替え；壁面補修（スイッチまわり）；ペットによる壁面破損の補修；白木目ドア補修；木目ドア補修。尚未合并或上线。

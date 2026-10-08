@@ -108,3 +108,9 @@
 - 地毯、猫抓、網戸使用本轮附件的三组真实照片；仅方向校正、等比例缩放、压缩与 WebP 转换。Before/After 完整显示自然比例。狗咬 After 附件缺失时保留既有完整照片对，不将本轮 Before 与旧 After 错配，不添加重复记录；补齐后更新既有 wallpaper-restoration。
 - 用户真实 LINE 二维码无损转为 assets/images/line/line-qr.png，lineQrReady=true；首页和 Contact 显示，lineUrl 继续为空。
 - 继续 PR #1 分支，不改 main、不合并、保留 noindex。
+
+## 2026-10-08 狗咬墙面照片补齐（用户确认）
+
+- 最新补传原图为狗咬墙面 After，与此前提供的狗咬 Before 配成同一真实案例，替换 wallpaper-restoration/before.webp 与 after.webp。
+- 沿用标题「ペットによる壁面破損の補修」、分类「壁面補修」，description 为空；不新增重复案例。仅方向校正、等比例缩放、压缩、WebP转换，完整显示原图比例。
+- 狗咬 Before/After 已补齐，替代此前缺 After 的素材状态。继续 PR #1，不改 main、不合并，保留 noindex。

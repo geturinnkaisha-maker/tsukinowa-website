@@ -44,4 +44,4 @@
 
 ## 当前素材状态（2026-10-08）
 
-真实 LINE 二维码已上传，lineQrReady=true，lineUrl仍为空。地毯、猫抓、網戸三组真实照片已配对，说明为空。狗咬新After缺失，既有wallpaper-restoration完整照片对暂时保留；补齐后更新该目录两张图，不新增重复案例、不混配新旧图片。
+真实 LINE 二维码已上传，lineQrReady=true，lineUrl仍为空。地毯、猫抓、網戸三组真实照片已配对，说明为空。狗咬 Before 与最新补传 After 已正式配齐，更新既有 wallpaper-restoration 目录两张图；标题及分类不变，说明为空，无重复案例。
