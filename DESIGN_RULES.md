@@ -101,3 +101,10 @@
 - 未发布或不完整图片对绝不显示；不显示空白卡、准备中案例卡或无实绩分类。首页最新4条完整真实案例，Works全部；缺图隐藏整条记录。
 - 当前仍为 GitHub Pages，图片用 GitHub Add file > Upload files 上传，上传后再编辑数据，最后才设 published=true。无假上传入口，不启用 Workers/R2/Firebase。
 - 基于现有 PR #1 分支继续；不改 main、不自动 merge、保留 noindex。
+
+## 2026-10-08 真实施工照片与 LINE（本轮确认）
+
+- 狗咬标题「ペットによる壁面破損の補修」/「壁面補修」；地毯「タイルカーペット張替え」/「CF・床施工」；猫抓「猫の引っかき傷によるクロス張替え」/「クロス張替え」；網戸「網戸張替え」/「その他内装補修」。这四组 description 为空，不加说明。
+- 地毯、猫抓、網戸使用本轮附件的三组真实照片；仅方向校正、等比例缩放、压缩与 WebP 转换。Before/After 完整显示自然比例。狗咬 After 附件缺失时保留既有完整照片对，不将本轮 Before 与旧 After 错配，不添加重复记录；补齐后更新既有 wallpaper-restoration。
+- 用户真实 LINE 二维码无损转为 assets/images/line/line-qr.png，lineQrReady=true；首页和 Contact 显示，lineUrl 继续为空。
+- 继续 PR #1 分支，不改 main、不合并、保留 noindex。

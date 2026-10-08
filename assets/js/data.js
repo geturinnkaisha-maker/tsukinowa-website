@@ -1,7 +1,7 @@
 window.SITE = {
   "lineUrl": "",
   "lineQrImage": "assets/images/line/line-qr.png",
-  "lineQrReady": false,
+  "lineQrReady": true,
   "logoUrl": "assets/images/logo/company-logo.svg",
   "phone": "070-3887-7789",
   "email": "geturinnkaisha@gmail.com",

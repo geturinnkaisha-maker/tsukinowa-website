@@ -45,15 +45,25 @@ const server = http.createServer((req,res) => {
             return css.objectFit === 'contain' && css.aspectRatio === 'auto' &&
               Math.abs(rect.width / rect.height - img.naturalWidth / img.naturalHeight) < 0.005;
           })), `complete image ratio: ${file} at ${width}`);
-          assert.equal(await page.locator('[data-works] .work').count(), 4);
-          const pet = page.locator('#wallpaper-restoration');
-          assert.equal(await pet.locator('h3').innerText(),'ペットによる壁面破損の補修');
-          assert.equal(await pet.locator('.work-tag').innerText(),'壁面補修');
+          assert.equal(await page.locator('[data-works] .work').count(), file === 'index.html' ? 4 : 7);
+          if (file === 'works.html') {
+            const pet = page.locator('#wallpaper-restoration');
+            assert.equal(await pet.locator('h3').innerText(),'ペットによる壁面破損の補修');
+            assert.equal(await pet.locator('.work-tag').innerText(),'壁面補修');
+          }
+          const expected = [['tile-carpet-replacement','タイルカーペット張替え','CF・床施工'],['cat-scratch-wallpaper','猫の引っかき傷によるクロス張替え','クロス張替え'],['screen-replacement','網戸張替え','その他内装補修']];
+          for (const [id,title,category] of expected) {
+            const item = page.locator('#'+id);
+            assert.equal(await item.locator('h3').innerText(),title);
+            assert.equal(await item.locator('.work-tag').innerText(),category);
+            assert.equal(await item.locator('p').count(),0);
+          }
         }
         if (['index.html','contact.html'].includes(file)) {
-          assert.equal(await page.locator('[data-line-qr-placeholder]').isVisible(),true);
-          assert.equal(await page.locator('[data-line-qr-placeholder]').innerText(),'LINE QR準備中');
-          assert.equal(await page.locator('[data-line-qr-image]').getAttribute('src'),null);
+          assert.equal(await page.locator('[data-line-qr-placeholder]').isVisible(),false);
+          assert.equal(await page.locator('[data-line-qr-image]').isVisible(),true);
+          assert.equal(await page.locator('[data-line-qr-image]').getAttribute('src'),'assets/images/line/line-qr.png');
+          assert.ok(await page.locator('[data-line-qr-image]').evaluate(img=>img.naturalWidth===900 && img.naturalHeight===900));
         }
         if (file === 'index.html') {
           assert.equal(await page.locator('.advantage').count(),3);
@@ -79,9 +89,9 @@ const server = http.createServer((req,res) => {
     assert.equal(await page.locator('#pet-wall-repair').count(),0);
     assert.ok(!/AI生成・施工事例ではありません/.test(await page.locator('body').innerText()));
     await load('works.html');
-    assert.equal(await page.locator('[data-works] .work').count(),4);
-    assert.equal(await page.locator('.comparison img').count(),8);
-    for(const [label,count] of [['ドア補修',2],['壁面補修',2],['すべて',4]]) {
+    assert.equal(await page.locator('[data-works] .work').count(),7);
+    assert.equal(await page.locator('.comparison img').count(),14);
+    for(const [label,count] of [['ドア補修',2],['壁面補修',2],['クロス張替え',1],['CF・床施工',1],['その他内装補修',1],['すべて',7]]) {
       await page.getByRole('button',{name:label,exact:true}).click();
       assert.equal(await page.locator('[data-works] .work').count(),count);
     }
@@ -94,7 +104,7 @@ const server = http.createServer((req,res) => {
     await page.getByRole('button',{name:'壁面補修',exact:true}).click();
     await page.evaluate(()=>location.hash='wood-grain-door');
     await page.waitForFunction(()=>document.getElementById('wood-grain-door'));
-    assert.equal(await page.locator('[data-works] .work').count(),4);
+    assert.equal(await page.locator('[data-works] .work').count(),7);
     await load('contact.html?service=内装補修');
     assert.equal(await page.locator('#service').inputValue(),'内装補修');
     for(const [selector,value] of [['#name','テスト'],['#phone','070-0000-0000'],['#email','test@example.com'],['#area','板橋区'],['#message','ドアの補修を相談したいです。'],['#timing','11月頃']]) await page.locator(selector).fill(value);
@@ -114,7 +124,7 @@ const server = http.createServer((req,res) => {
     assert.equal(await page.locator('[data-line-direct]').isVisible(),false);
     await page.setViewportSize({width:1440,height:900});
     assert.equal(await page.locator('[data-line-qr]').isVisible(),true);
-    assert.match(await page.locator('[data-line-qr]').innerText(),/準備中/);
+    assert.equal(await page.locator('[data-line-qr-image]').isVisible(),true);
     // Configured LINE uses only a supplied URL and QR; never generate one.
     await page.route('**/assets/js/data.js',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/data.js','utf8').replace('"lineUrl": ""','"lineUrl": "https://line.me/R/ti/p/test-fixture"').replace('"lineQrReady": false','"lineQrReady": true')}));
     // Fixture bytes validate the image loading mechanics; never a production QR.
@@ -160,7 +170,7 @@ const server = http.createServer((req,res) => {
     `}));
     for (const file of ['index.html','works.html']) {
       await load(file);
-      assert.equal(await page.locator('[data-works] .work').count(),4);
+      assert.equal(await page.locator('[data-works] .work').count(),file === 'index.html' ? 4 : 7);
       assert.equal(await page.locator('#hidden-fixture').count(),0);
       assert.ok(!/施工準備中|施工写真は掲載準備中/.test(await page.locator('[data-works]').innerText()));
     }
@@ -176,7 +186,7 @@ const server = http.createServer((req,res) => {
     await load('index.html');assert.equal(await page.locator('[data-services] .service-row').count(),5);
     await load('contact.html?service=内装デザイン');assert.equal(await page.locator('#service').inputValue(),'内装デザイン');
     assert.equal(requests.filter(request=>request.method!=='GET').length,0);
-    assert.equal(requests.filter(request=>request.url.includes('/assets/images/line/line-qr.png')).length,0);
+    assert.ok(requests.some(request=>request.url.includes('/assets/images/line/line-qr.png')));
     assert.deepEqual(await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length})),{local:0,session:0});
     assert.deepEqual(failures,[]);assert.deepEqual(errors,[]);
     console.log('PASS: 6 pages × 4 widths, noindex, contacts, LINE, full photo ratios, latest 4/all/filter/hash, hidden drafts/incomplete/failed-image cases, no empty cards or future category filters, no resource errors.');
