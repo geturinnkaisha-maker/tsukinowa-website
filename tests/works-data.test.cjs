@@ -13,7 +13,14 @@ test('published real cases have complete actual WebP pairs; drafts stay hidden',
   const works = select(context.window.WORKS_DATA);
   assert.equal(works.length, 4);
   for (const work of works) for (const key of ['beforeImage', 'afterImage']) assert.ok(fs.existsSync(work[key]), work[key]);
-  assert.ok(!works.some(work => work.id === 'pet-wall-repair'));
+  assert.equal(context.window.WORKS_DATA.length, 4);
+  assert.ok(!context.window.WORKS_DATA.some(work => work.id === 'pet-wall-repair'));
+  const pet = works.filter(work => work.title.includes('ペット'));
+  assert.equal(pet.length, 1);
+  assert.equal(pet[0].title, 'ペットによる壁面破損の補修');
+  assert.equal(pet[0].category, '壁面補修');
+  assert.equal(pet[0].description, 'ペットによる壁面の破損箇所を補修しました。');
+  assert.ok(!/原状回復|クロス補修/.test(pet[0].title + pet[0].category + pet[0].description));
 });
 test('new records sort by date, then publication date; missing month uses publication date', () => {
   const works = select([record('old', {date:'2025-12'}), record('tie-old', {publishedAt:'2026-09-30'}), record('tie-new'), record('unknown', {date:''}), record('newest', {date:'2026-11'})]);

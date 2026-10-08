@@ -2,20 +2,6 @@
 // 写真が揃っていないケースは published: false のままにしてください。
 window.WORKS_DATA = [
   {
-    "id": "pet-wall-repair",
-    "title": "ペットによる壁面破損の補修",
-    "category": "壁面補修",
-    "date": "",
-    "publishedAt": "",
-    "area": "",
-    "propertyType": "",
-    "description": "ペットによる壁面の破損箇所を補修しました。",
-    "beforeImage": "assets/images/works/real/pet-wall-repair/before.webp",
-    "afterImage": "assets/images/works/real/pet-wall-repair/after.webp",
-    "imageType": "real",
-    "published": false
-  },
-  {
     "id": "white-grain-door",
     "title": "白木目ドア補修",
     "category": "ドア補修",
@@ -45,13 +31,13 @@ window.WORKS_DATA = [
   },
   {
     "id": "wallpaper-restoration",
-    "title": "クロス補修・原状回復",
-    "category": "原状回復",
+    "title": "ペットによる壁面破損の補修",
+    "category": "壁面補修",
     "date": "",
     "publishedAt": "2026-10-05",
     "area": "",
     "propertyType": "",
-    "description": "傷みのあった壁面を補修し、クロスを整えました。",
+    "description": "ペットによる壁面の破損箇所を補修しました。",
     "beforeImage": "assets/images/works/real/wallpaper-restoration/before.webp",
     "afterImage": "assets/images/works/real/wallpaper-restoration/after.webp",
     "imageType": "real",

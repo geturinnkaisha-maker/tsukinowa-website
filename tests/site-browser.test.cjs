@@ -38,11 +38,38 @@ const server = http.createServer((req,res) => {
         await load(file);
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth), `${file} overflows at ${width}`);
         assert.match(await page.locator('meta[name="robots"]').getAttribute('content'),/noindex/);
+        assert.ok(!/くらしのマーケット|暮らしのマーケット|外部サービスにも掲載/.test(await page.locator('body').innerText()));
+        if (['index.html','works.html'].includes(file)) {
+          assert.ok(await page.locator('.comparison img').evaluateAll(images => images.every(img => {
+            const css = getComputedStyle(img), rect = img.getBoundingClientRect();
+            return css.objectFit === 'contain' && css.aspectRatio === 'auto' &&
+              Math.abs(rect.width / rect.height - img.naturalWidth / img.naturalHeight) < 0.005;
+          })), `complete image ratio: ${file} at ${width}`);
+          assert.equal(await page.locator('[data-works] .work').count(), 4);
+          const pet = page.locator('#wallpaper-restoration');
+          assert.equal(await pet.locator('h3').innerText(),'ペットによる壁面破損の補修');
+          assert.equal(await pet.locator('.work-tag').innerText(),'壁面補修');
+        }
+        if (['index.html','contact.html'].includes(file)) {
+          assert.equal(await page.locator('[data-line-qr-placeholder]').isVisible(),true);
+          assert.equal(await page.locator('[data-line-qr-placeholder]').innerText(),'LINE QR準備中');
+          assert.equal(await page.locator('[data-line-qr-image]').getAttribute('src'),null);
+        }
+        if (file === 'index.html') {
+          assert.equal(await page.locator('.advantage').count(),3);
+          assert.match(await page.locator('#personal-pricing .price').innerText(),/1,400円\/㎡/);
+          assert.match(await page.locator('#personal-pricing h3').innerText(),/材工込み/);
+        }
+        if (file === 'contact.html') {
+          assert.equal(await page.locator('button[type="submit"]').isDisabled(),true);
+          assert.ok(await page.locator('#form-availability').evaluate(note => note.compareDocumentPosition(document.getElementById('name')) & Node.DOCUMENT_POSITION_FOLLOWING));
+          assert.ok(await page.locator('.contact-methods').evaluate(options => options.compareDocumentPosition(document.getElementById('contact-form')) & Node.DOCUMENT_POSITION_FOLLOWING));
+        }
         assert.ok(await page.locator('[data-phone]').evaluateAll(links=>links.every(link=>link.getAttribute('href')==='tel:070-3887-7789')));
         assert.ok(await page.locator('[data-email]').evaluateAll(links=>links.every(link=>link.getAttribute('href')==='mailto:geturinnkaisha@gmail.com')));
         assert.ok(await page.locator('[data-line]').evaluateAll(links=>links.every(link=>link.getAttribute('href')==='contact.html#line')));
         assert.ok(await page.evaluate(()=>Array.from(document.images).every(image=>image.naturalWidth>0 || image.hidden)));
-        if(screenshots && [390,1440].includes(width) && ['index.html','contact.html'].includes(file)) await page.screenshot({path:path.join(screenshots,`${file.replace('.html','')}-${width}.png`),fullPage:true});
+        if(screenshots) await page.screenshot({path:path.join(screenshots,`${file.replace('.html','')}-${width}.png`),fullPage:true});
         if(width<=600) assert.ok(await page.locator('.mobile-contact').evaluate(el=>el.getBoundingClientRect().height<=65));
       }
     }
@@ -54,10 +81,16 @@ const server = http.createServer((req,res) => {
     await load('works.html');
     assert.equal(await page.locator('[data-works] .work').count(),4);
     assert.equal(await page.locator('.comparison img').count(),8);
-    for(const [label,count] of [['ドア補修',2],['壁面補修',1],['原状回復',1],['すべて',4]]) {
+    for(const [label,count] of [['ドア補修',2],['壁面補修',2],['すべて',4]]) {
       await page.getByRole('button',{name:label,exact:true}).click();
       assert.equal(await page.locator('[data-works] .work').count(),count);
     }
+    const original = page.locator('#white-grain-door .work-photo-link').first();
+    assert.equal(await original.getAttribute('href'), 'assets/images/works/real/white-grain-door/before.webp');
+    const [photoPage] = await Promise.all([context.waitForEvent('page'), original.click()]);
+    await photoPage.waitForLoadState();
+    assert.match(photoPage.url(),/white-grain-door\/before.webp$/);
+    await photoPage.close();
     await page.getByRole('button',{name:'壁面補修',exact:true}).click();
     await page.evaluate(()=>location.hash='wood-grain-door');
     await page.waitForFunction(()=>document.getElementById('wood-grain-door'));
@@ -83,12 +116,24 @@ const server = http.createServer((req,res) => {
     assert.equal(await page.locator('[data-line-qr]').isVisible(),true);
     assert.match(await page.locator('[data-line-qr]').innerText(),/準備中/);
     // Configured LINE uses only a supplied URL and QR; never generate one.
-    await page.route('**/assets/js/data.js',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/data.js','utf8').replace('"lineUrl": ""','"lineUrl": "https://line.me/R/ti/p/test-fixture"').replace('"lineQrImage": ""','"lineQrImage": "assets/images/works/real/wood-grain-door/after.webp"')}));
+    await page.route('**/assets/js/data.js',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/data.js','utf8').replace('"lineUrl": ""','"lineUrl": "https://line.me/R/ti/p/test-fixture"').replace('"lineQrReady": false','"lineQrReady": true')}));
+    // Fixture bytes validate the image loading mechanics; never a production QR.
+    await page.route('**/assets/images/line/line-qr.png',route=>route.fulfill({contentType:'image/webp',body:fs.readFileSync('assets/images/works/real/wood-grain-door/after.webp')}));
     await load('contact.html');
     assert.equal(await page.locator('[data-line-qr-image]').isVisible(),true);
+    await load('index.html');
+    assert.equal(await page.locator('[data-line-qr-image]').isVisible(),true);
+    await load('contact.html');
     await page.setViewportSize({width:390,height:900});
     assert.equal(await page.locator('[data-line-direct]').isVisible(),true);
     assert.equal(await page.locator('[data-line-direct]').getAttribute('href'),'https://line.me/R/ti/p/test-fixture');
+    // Broken/unavailable uploaded image falls back to the same visible slot.
+    await page.unroute('**/assets/images/line/line-qr.png');
+    await page.route('**/assets/images/line/line-qr.png',route=>route.fulfill({contentType:'image/png',body:'invalid image fixture'}));
+    await load('contact.html');
+    assert.equal(await page.locator('[data-line-qr-image]').isVisible(),false);
+    assert.equal(await page.locator('[data-line-qr-placeholder]').isVisible(),true);
+    await page.unroute('**/assets/images/line/line-qr.png');
     await page.unroute('**/assets/js/data.js');
     // Five/six synthetic records expose the latest-four cap and all-items behavior.
     // Reuse only real paired fixture bytes for deterministic local test requests.
@@ -102,7 +147,9 @@ const server = http.createServer((req,res) => {
     await load('index.html');assert.equal(await page.locator('[data-services] .service-row').count(),5);
     await load('contact.html?service=内装デザイン');assert.equal(await page.locator('#service').inputValue(),'内装デザイン');
     assert.equal(requests.filter(request=>request.method!=='GET').length,0);
+    assert.equal(requests.filter(request=>request.url.includes('/assets/images/line/line-qr.png')).length,0);
+    assert.deepEqual(await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length})),{local:0,session:0});
     assert.deepEqual(failures,[]);assert.deepEqual(errors,[]);
-    console.log('PASS: 6 pages × 4 widths, noindex, contacts, LINE placeholders/configuration, photos + no submission, works latest 4/all/filter/hash/draft, appended services, no resource errors.');
+    console.log('PASS: 6 pages × 4 widths, noindex, contacts, LINE placeholders/configuration, photos + no submission, uncropped image ratios, pet correction/deduplication, platform removal, early form notice, works latest 4/all/filter/hash, appended services, no resource errors.');
   } finally { await browser.close(); }
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>server.close());

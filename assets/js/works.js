@@ -43,15 +43,23 @@
       const figure = node('figure');
       const image = node('img');
       image.alt = `${work.title} ${label}の実際の施工写真`;
-      image.width = 800;
-      image.height = 600;
       image.loading = 'lazy';
       image.addEventListener('error', () => {
         // Remove the incomplete pair: never substitute an illustration or fake After.
         pair.replaceChildren(node('p', '写真を確認中です。', 'notice'));
       }, { once: true });
       image.src = src;
-      figure.append(image, node('figcaption', label));
+      if (preview) figure.append(image);
+      else {
+        const original = node('a', null, 'work-photo-link');
+        original.href = src;
+        original.target = '_blank';
+        original.rel = 'noopener';
+        original.setAttribute('aria-label', `${work.title} ${label}の写真を大きく見る（新しいタブ）`);
+        original.append(image);
+        figure.append(original);
+      }
+      figure.append(node('figcaption', label));
       pair.append(figure);
     });
     const heading = node('div', null, 'work-heading');

@@ -14,10 +14,12 @@ if(config.logoUrl){document.querySelectorAll('.logo-slot').forEach(slot=>{const 
 document.querySelectorAll('[data-price]').forEach(e=>{e.textContent=config.price;});
 
 const qrPath = typeof config.lineQrImage === 'string' && /^assets\/images\/[a-zA-Z0-9/_-]+\.(png|jpe?g|webp|svg)$/.test(config.lineQrImage) ? config.lineQrImage : null;
-const qrImage = document.querySelector('[data-line-qr-image]');
-if (qrPath && qrImage) {
-  const placeholder = document.querySelector('[data-line-qr-placeholder]');
+// Keep the slot visible without requesting a missing asset until a real QR is uploaded.
+document.querySelectorAll('[data-line-qr]').forEach(slot => {
+  const qrImage = slot.querySelector('[data-line-qr-image]');
+  const placeholder = slot.querySelector('[data-line-qr-placeholder]');
+  if (!qrPath || config.lineQrReady !== true || !qrImage || !placeholder) return;
   qrImage.addEventListener('load', () => { qrImage.hidden = false; placeholder.hidden = true; });
-  qrImage.addEventListener('error', () => { qrImage.hidden = true; placeholder.hidden = false; });
+  qrImage.addEventListener('error', () => { qrImage.hidden = true; placeholder.hidden = false; qrImage.removeAttribute('src'); });
   qrImage.src = qrPath;
-}
+});

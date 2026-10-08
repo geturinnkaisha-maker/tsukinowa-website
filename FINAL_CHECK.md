@@ -1,3 +1,22 @@
+# 本轮检查 — 2026-10-08
+
+- 仅修改 geturinnkaisha-maker/tsukinowa-website 的新分支；不改 main、不 merge、不改旧账号仓库或内部系统。
+- 6页（index / works / contact / company / privacy / legal）× 320 / 390 / 768 / 1440px，视口高度900px：24组浏览器检查通过。无横向溢出，CSS / JS / 图片无404或请求失败，页面无JavaScript异常；六页 noindex 保留。
+- 首页三项优势；网站及维护文档无第三方平台宣传、链接、品牌名称。无新增评价模块。
+- 四组真实案例公开：白木目ドア補修 / 壁面補修（スイッチまわり） / ペットによる壁面破損の補修 / 木目ドア補修。宠物记录分类壁面補修，说明为用户指定文字；重复未发布记录删除。历史参考照片原文件保留，不另发布。
+- 施工图均按原图自然比例显示；逐张核对显示尺寸比例、contain 与无固定aspect ratio；Works点击源图测试通过。真实施工图文件未修改，未裁切、未AI改图。
+- LINE固定路径 assets/images/line/line-qr.png；首页及Contact在所有宽度显示 LINE QR準備中。未上传前 lineQrReady=false，不请求缺失资源；上传后需改true。测试了启用图片、真实URL配置和无效图片回退（仅本地测试素材，不进入网站）。空lineUrl无外部假链接。
+- Contact首屏以LINE / 电话 / 邮件为主；当前实际可用电话070-3887-7789及mailto:geturinnkaisha@gmail.com。邮件应用需客户自行发送。
+- 表单提示位于首个字段之前；送信继续禁用，全部字段及端末内照片预览保留。填入测试信息、选择照片并强制requestSubmit后无提交请求，localStorage/sessionStorage均为空；未发送邮件或保存数据。
+- 地址、受付時間 9:30～18:30、土日祝もご相談・施工対応可（要日程調整）及品牌保持。main的旧价格单位円/m～按本次明确口径修正为円/㎡，金额1,400、材工込み保持。
+- 数据测试3项通过；浏览器筛选、锚点、首页最新4条及全部案例检查通过。git diff --check通过。
+- CONTENT_UPDATE_GUIDE.md新增GitHub网页上传、二维码启用、案例图片规范及数据编辑说明。本轮没有新增待确认的日文业务事实；legal.html原有要最終確認保留。
+- 检查针对PR分支；未合并前在线站点仍是main版本。
+
+---
+
+## 历史记录（以下不代表当前网站状态）
+
 # 测试上线最终检查 — 2026-10-03
 
 - 范围：独立 tsukinowa-website；未修改 geruninn，未接数据库，未购买或绑定域名。
@@ -6,7 +25,6 @@
 - 手机菜单打开／Escape 关闭、表单邮件草稿生成／编辑后重新确认通过；未发送测试邮件。
 - SEO：六页 title、description、OG、canonical、favicon、sitemap 和 robots 齐备；分享图是首页界面截图。测试阶段保留 noindex。
 - 真实案例：壁穴、门、壁纸、CF/地板各需 Before / After 共至少 8 张，配地区、物业类型、内容、简述及公开许可；内装補修服务图也需真实照片。全部未提供，保持占位。真实路径校验及缺图回退逻辑已验证：AI／示意图、缺少分类、路径穿越、不完整配对均返回占位。
-- 正式链接：LINE、くらしのマーケット均未提供，data.js 统一配置，界面明确準備中。电话 070-3887-7789、邮箱 geturinnkaisha@gmail.com 已核对。
 - 正式 Logo：替换 assets/images/logo/company-logo.svg 一份即可六页生效；favicon 仍为临时图标。
 - 可安全推送：是，仅该独立项目内容；没有凭据、客户资料、生产数据或其他项目文件。
 - 可启用 Pages：技术上可直接使用 main / (root) 测试发布。照片／链接／Logo 占位不阻塞测试；privacy 和 legal 仍需公司确认，尚不视为正式营业版。
