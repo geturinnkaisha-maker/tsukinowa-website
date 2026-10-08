@@ -20,7 +20,7 @@ for page in sorted(root.glob('*.html')):
  og=f'<meta property="og:url" content="{escape(url, {chr(34): "&quot;"})}">'
  text=re.sub(r'<!-- CANONICAL:.*?-->|<link rel="canonical"[^>]*>',lambda _:canonical,text)
  text=re.sub(r'<!-- OG_URL:.*?-->|<meta property="og:url"[^>]*>',lambda _:og,text)
- image=f'<meta property="og:image" content="{base}assets/images/og-preview.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="月輪合同会社 内装工事・原状回復のご案内（テスト公開）">'
+ image=f'<meta property="og:image" content="{base}assets/images/og-preview.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="月輪合同会社 内装工事・原状回復のご案内">'
  text=re.sub(r'<!-- OG_IMAGE:.*?-->|<meta property="og:image"[^>]*>(?:<meta property="og:image:(?:width|height|alt)"[^>]*>)*',lambda _:image,text)
  page.write_text(text)
  urls.append(url)

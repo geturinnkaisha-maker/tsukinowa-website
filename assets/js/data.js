@@ -1,5 +1,5 @@
 window.SITE = {
-  "lineUrl": "",
+  "lineUrl": "https://line.me/ti/p/m7O5HD_iVK",
   "lineQrImage": "assets/images/line/line-qr.png",
   "lineQrReady": true,
   "logoUrl": "assets/images/logo/company-logo.svg",

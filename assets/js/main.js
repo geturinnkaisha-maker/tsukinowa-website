@@ -3,7 +3,7 @@ toggle.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expand
 nav.addEventListener('click',e=>{if(e.target.closest('a')){toggle.setAttribute('aria-expanded','false');nav.classList.remove('open');}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){toggle.setAttribute('aria-expanded','false');nav.classList.remove('open');toggle.focus();}});
 const config=window.SITE;
-function safeUrl(value){try{const url=new URL(value);return url.protocol==='https:'?url.href:null;}catch{return null;}}
+function safeUrl(value){try{const url=new URL(value);return url.protocol==='https:' && ['line.me','lin.ee'].includes(url.hostname) && !url.username && !url.password ? url.href : null;}catch{return null;}}
 const lineUrl=safeUrl(config.lineUrl);
 const phoneHref='tel:'+config.phone;
 document.querySelectorAll('[data-phone]').forEach(a=>{a.href=phoneHref;if(a.textContent!=='電話')a.textContent=config.phone;});
