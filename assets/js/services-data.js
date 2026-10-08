@@ -17,9 +17,7 @@ window.SERVICES_DATA = [
   {
     "title": "内装補修",
     "description": "壁穴・ドアなどの部分補修に。気になる箇所の写真からもご相談いただけます。",
-    "image": "assets/images/works/placeholders/real-photo.svg",
-    "alt": "壁穴・ドアなどの内装補修のご相談",
-    "caption": "気になる箇所の写真からもご相談いただけます。"
+    "caseIds": ["wallpaper-restoration", "white-grain-door"]
   },
   {
     "title": "原状回復",

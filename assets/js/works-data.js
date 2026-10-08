@@ -67,7 +67,9 @@ window.WORKS_DATA = [
     "beforeImage": "assets/images/works/real/wallpaper-restoration/before.webp",
     "afterImage": "assets/images/works/real/wallpaper-restoration/after.webp",
     "imageType": "real",
-    "published": true
+    "published": true,
+    "homeFeatured": true,
+    "homeOrder": 1
   },
   {
     "id": "wood-grain-door",
@@ -81,7 +83,9 @@ window.WORKS_DATA = [
     "beforeImage": "assets/images/works/real/wood-grain-door/before.webp",
     "afterImage": "assets/images/works/real/wood-grain-door/after.webp",
     "imageType": "real",
-    "published": true
+    "published": true,
+    "homeFeatured": true,
+    "homeOrder": 2
   },
   {
     "id": "tile-carpet-replacement",
@@ -109,7 +113,9 @@ window.WORKS_DATA = [
     "beforeImage": "assets/images/works/real/cat-scratch-wallpaper/before.webp",
     "afterImage": "assets/images/works/real/cat-scratch-wallpaper/after.webp",
     "imageType": "real",
-    "published": true
+    "published": true,
+    "homeFeatured": true,
+    "homeOrder": 3
   },
   {
     "id": "screen-replacement",
@@ -123,6 +129,8 @@ window.WORKS_DATA = [
     "beforeImage": "assets/images/works/real/screen-replacement/before.webp",
     "afterImage": "assets/images/works/real/screen-replacement/after.webp",
     "imageType": "real",
-    "published": true
+    "published": true,
+    "homeFeatured": true,
+    "homeOrder": 4
   }
 ];
