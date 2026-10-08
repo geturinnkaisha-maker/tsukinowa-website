@@ -37,7 +37,7 @@ const server = http.createServer((req,res) => {
       for (const file of ['index.html','works.html','contact.html','company.html','privacy.html','legal.html']) {
         await load(file);
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth), `${file} overflows at ${width}`);
-        assert.match(await page.locator('meta[name="robots"]').getAttribute('content'),/noindex/);
+        assert.ok(await page.locator('meta[name="robots"]').evaluateAll(tags => tags.every(tag => !/noindex/i.test(tag.content))));
         assert.ok(!/くらしのマーケット|暮らしのマーケット|外部サービスにも掲載/.test(await page.locator('body').innerText()));
         if (['index.html','works.html'].includes(file)) {
           assert.ok(await page.locator('.comparison img').evaluateAll(images => images.every(img => {
@@ -204,6 +204,6 @@ const server = http.createServer((req,res) => {
     assert.ok(requests.some(request=>request.url.includes('/assets/images/line/line-qr.png')));
     assert.deepEqual(await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length})),{local:0,session:0});
     assert.deepEqual(failures,[]);assert.deepEqual(errors,[]);
-    console.log('PASS: 6 pages × 4 widths, noindex, contacts, LINE, full photo ratios, latest 4/all/filter/hash, hidden drafts/incomplete/failed-image cases, no empty cards or future category filters, no resource errors.');
+    console.log('PASS: 6 pages × 4 widths, no noindex, contacts, LINE, full photo ratios, latest 4/all/filter/hash, hidden drafts/incomplete/failed-image cases, no empty cards or future category filters, no resource errors.');
   } finally { await browser.close(); }
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>server.close());
