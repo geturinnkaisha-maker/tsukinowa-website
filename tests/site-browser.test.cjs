@@ -52,7 +52,7 @@ const server = http.createServer((req,res) => {
             assert.equal(await pet.locator('.work-tag').innerText(),'壁面補修');
           }
           const expected = [['tile-carpet-replacement','タイルカーペット張替え','CF・床施工'],['cat-scratch-wallpaper','猫の引っかき傷によるクロス張替え','クロス張替え'],['screen-replacement','網戸張替え','その他内装補修']];
-          for (const [id,title,category] of expected) {
+          for (const [id,title,category] of expected.filter(([id]) => file === 'works.html' || id !== 'tile-carpet-replacement')) {
             const item = page.locator('#'+id);
             assert.equal(await item.locator('h3').innerText(),title);
             assert.equal(await item.locator('.work-tag').innerText(),category);
@@ -66,6 +66,21 @@ const server = http.createServer((req,res) => {
           assert.ok(await page.locator('[data-line-qr-image]').evaluate(img=>img.naturalWidth===900 && img.naturalHeight===900));
         }
         if (file === 'index.html') {
+          assert.deepEqual(await page.locator('[data-works] .work').evaluateAll(items=>items.map(item=>item.id)),
+            ['wallpaper-restoration','wood-grain-door','cat-scratch-wallpaper','screen-replacement']);
+          const repair = page.locator('.service-row').nth(2);
+          assert.deepEqual(await repair.locator('h4').allTextContents(), ['ペットによる壁面破損の補修','白木目ドア補修']);
+          assert.deepEqual(await repair.locator('img').evaluateAll(images=>images.map(img=>img.getAttribute('src'))),
+            ['wallpaper-restoration','white-grain-door'].flatMap(id=>['before','after'].map(label=>`assets/images/works/real/${id}/${label}.webp`)));
+          assert.deepEqual(await repair.locator('figcaption').allTextContents(), ['Before','After','Before','After']);
+          assert.ok(!/掲載準備中|実際の施工写真|写真でご相談ください/.test(await repair.locator('.service-repair-examples').innerText()));
+          assert.ok(await repair.locator('img').evaluateAll(images=>images.every(img=>{
+            const css=getComputedStyle(img), rect=img.getBoundingClientRect();
+            return img.naturalWidth>0 && css.objectFit==='contain' && css.aspectRatio==='auto' &&
+              Math.abs(rect.width/rect.height-img.naturalWidth/img.naturalHeight)<0.005;
+          })), `repair photo ratios at ${width}`);
+          if(width===1440) assert.ok(await repair.evaluate(el=>el.querySelector('.service-repair-examples').getBoundingClientRect().right<=el.querySelector('.service-copy').getBoundingClientRect().left));
+          if(screenshots) await repair.screenshot({path:path.join(screenshots,`repair-${width}.png`)});
           assert.equal(await page.locator('.advantage').count(),3);
           assert.match(await page.locator('#personal-pricing .price').innerText(),/1,400円\/㎡/);
           assert.match(await page.locator('#personal-pricing h3').innerText(),/材工込み/);
@@ -77,7 +92,7 @@ const server = http.createServer((req,res) => {
         }
         assert.ok(await page.locator('[data-phone]').evaluateAll(links=>links.every(link=>link.getAttribute('href')==='tel:070-3887-7789')));
         assert.ok(await page.locator('[data-email]').evaluateAll(links=>links.every(link=>link.getAttribute('href')==='mailto:geturinnkaisha@gmail.com')));
-        assert.ok(await page.locator('[data-line]').evaluateAll(links=>links.every(link=>link.getAttribute('href')==='contact.html#line')));
+        assert.ok(await page.locator('[data-line]').evaluateAll(links=>links.every(link=>link.getAttribute('href')==='https://line.me/ti/p/m7O5HD_iVK')));
         assert.ok(await page.evaluate(()=>Array.from(document.images).every(image=>image.naturalWidth>0 || image.hidden)));
         if(screenshots) await page.screenshot({path:path.join(screenshots,`${file.replace('.html','')}-${width}.png`),fullPage:true});
         if(width<=600) assert.ok(await page.locator('.mobile-contact').evaluate(el=>el.getBoundingClientRect().height<=65));
@@ -126,7 +141,7 @@ const server = http.createServer((req,res) => {
     assert.equal(await page.locator('[data-line-qr]').isVisible(),true);
     assert.equal(await page.locator('[data-line-qr-image]').isVisible(),true);
     // Configured LINE uses only a supplied URL and QR; never generate one.
-    await page.route('**/assets/js/data.js',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/data.js','utf8').replace('"lineUrl": ""','"lineUrl": "https://line.me/R/ti/p/test-fixture"').replace('"lineQrReady": false','"lineQrReady": true')}));
+    await page.route('**/assets/js/data.js*',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/data.js','utf8').replace('"lineUrl": "https://line.me/ti/p/m7O5HD_iVK"','"lineUrl": "https://line.me/R/ti/p/test-fixture"').replace('"lineQrReady": false','"lineQrReady": true')}));
     // Fixture bytes validate the image loading mechanics; never a production QR.
     await page.route('**/assets/images/line/line-qr.png',route=>route.fulfill({contentType:'image/webp',body:fs.readFileSync('assets/images/works/real/wood-grain-door/after.webp')}));
     await load('contact.html');
@@ -144,10 +159,10 @@ const server = http.createServer((req,res) => {
     assert.equal(await page.locator('[data-line-qr-image]').isVisible(),false);
     assert.equal(await page.locator('[data-line-qr-placeholder]').isVisible(),true);
     await page.unroute('**/assets/images/line/line-qr.png');
-    await page.unroute('**/assets/js/data.js');
+    await page.unroute('**/assets/js/data.js*');
     // Five/six synthetic records expose the latest-four cap and all-items behavior.
     // Reuse only real paired fixture bytes for deterministic local test requests.
-    await page.route('**/assets/js/works-data.js',route=>route.fulfill({contentType:'text/javascript',body:`window.WORKS_DATA=Array.from({length:6},(_,i)=>({id:'fixture-'+i,title:'Fixture '+i,category:'追加カテゴリ',date:'2026-0'+(i+1),publishedAt:'2026-10-05',imageType:'real',published:true,beforeImage:'assets/images/works/real/fixture-'+i+'/before.webp',afterImage:'assets/images/works/real/fixture-'+i+'/after.webp'}));`}));
+    await page.route('**/assets/js/works-data.js*',route=>route.fulfill({contentType:'text/javascript',body:`window.WORKS_DATA=Array.from({length:6},(_,i)=>({id:'fixture-'+i,title:'Fixture '+i,category:'追加カテゴリ',date:'2026-0'+(i+1),publishedAt:'2026-10-05',imageType:'real',published:true,beforeImage:'assets/images/works/real/fixture-'+i+'/before.webp',afterImage:'assets/images/works/real/fixture-'+i+'/after.webp'}));`}));
     await page.route('**/works/real/fixture-*/*.webp',route=>route.fulfill({contentType:'image/webp',body:fs.readFileSync('assets/images/works/real/wood-grain-door/before.webp')}));
     await load('index.html');
     assert.deepEqual(await page.locator('[data-works] .work').evaluateAll(items=>items.map(item=>item.id)),['fixture-5','fixture-4','fixture-3','fixture-2']);
@@ -162,9 +177,9 @@ const server = http.createServer((req,res) => {
     assert.equal(await page.locator('#fixture-5').count(),0);
     assert.ok(!/写真を確認中|施工写真は掲載準備中/.test(await page.locator('[data-works]').innerText()));
     await page.unroute('**/works/real/fixture-5/after.webp');
-    await page.unroute('**/assets/js/works-data.js');
+    await page.unroute('**/assets/js/works-data.js*');
     // Drafts with absent files, missing Before/After, and blank metadata request no images.
-    await page.route('**/assets/js/works-data.js',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/works-data.js','utf8')+`
+    await page.route('**/assets/js/works-data.js*',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/works-data.js','utf8')+`
       const base={id:'hidden-fixture',title:'Hidden',category:'穴補修',imageType:'real',published:true,beforeImage:'assets/images/works/real/hidden-fixture/before.webp',afterImage:'assets/images/works/real/hidden-fixture/after.webp'};
       window.WORKS_DATA.push({...base,published:false},{...base,afterImage:''},{...base,beforeImage:''},{...base,title:' '},{...base,category:''});
     `}));
@@ -176,13 +191,13 @@ const server = http.createServer((req,res) => {
     }
     assert.equal(await page.getByRole('button',{name:'穴補修',exact:true}).count(),0);
     assert.equal(requests.filter(request=>request.url.includes('hidden-fixture') || request.url.includes('/_template/')).length,0);
-    await page.unroute('**/assets/js/works-data.js');
-    await page.route('**/assets/js/works-data.js',route=>route.fulfill({contentType:'text/javascript',body:'window.WORKS_DATA=[];'}));
+    await page.unroute('**/assets/js/works-data.js*');
+    await page.route('**/assets/js/works-data.js*',route=>route.fulfill({contentType:'text/javascript',body:'window.WORKS_DATA=[];'}));
     await load('works.html');
     assert.equal(await page.locator('[data-works]').innerText(),'');
     assert.equal(await page.locator('[data-works] .work').count(),0);
-    await page.unroute('**/assets/js/works-data.js');
-    await page.route('**/assets/js/services-data.js',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/services-data.js','utf8')+'window.SERVICES_DATA.push({title:"内装デザイン",description:"テスト用追加サービス"});'}));
+    await page.unroute('**/assets/js/works-data.js*');
+    await page.route('**/assets/js/services-data.js*',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/services-data.js','utf8')+'window.SERVICES_DATA.push({title:"内装デザイン",description:"テスト用追加サービス"});'}));
     await load('index.html');assert.equal(await page.locator('[data-services] .service-row').count(),5);
     await load('contact.html?service=内装デザイン');assert.equal(await page.locator('#service').inputValue(),'内装デザイン');
     assert.equal(requests.filter(request=>request.method!=='GET').length,0);

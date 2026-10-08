@@ -320,3 +320,12 @@ footer{padding-top:44px}.footer-grid{gap:36px}
 .contact-page .contact-methods .phone{margin:6px 0 12px}
 .contact-page .line-qr{min-height:120px}
 @media(max-width:950px){.contact-page .line-qr{min-height:48px;padding:12px}}
+
+/* Repair service: two real cases, with full photos and labels below each image. */
+.service-repair-examples{display:grid;gap:20px;min-width:0}
+.service-repair-example{min-width:0}
+.service-repair-example h4{font-size:14px;font-weight:500;line-height:1.7;margin:0 0 8px}
+.service-repair-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start}
+.service-repair-pair figure{min-width:0}
+.service-row .service-repair-pair img{width:100%;height:auto;aspect-ratio:auto;object-fit:contain}
+.service-repair-pair figcaption{position:static;margin-top:4px;font-size:12px}

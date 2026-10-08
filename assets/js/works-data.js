@@ -29,7 +29,6 @@ window.WORKS_CATEGORIES = [
 window.WORKS_DATA = [
   {
     "id": "white-grain-door",
-    "homeFeatured": true,
     "title": "白木目ドア補修",
     "category": "ドア補修",
     "date": "",
@@ -44,7 +43,6 @@ window.WORKS_DATA = [
   },
   {
     "id": "switch-wall-repair",
-    "homeFeatured": true,
     "title": "壁面補修（スイッチまわり）",
     "category": "壁面補修",
     "date": "",
@@ -59,7 +57,6 @@ window.WORKS_DATA = [
   },
   {
     "id": "wallpaper-restoration",
-    "homeFeatured": true,
     "title": "ペットによる壁面破損の補修",
     "category": "壁面補修",
     "date": "",
@@ -70,11 +67,12 @@ window.WORKS_DATA = [
     "beforeImage": "assets/images/works/real/wallpaper-restoration/before.webp",
     "afterImage": "assets/images/works/real/wallpaper-restoration/after.webp",
     "imageType": "real",
-    "published": true
+    "published": true,
+    "homeFeatured": true,
+    "homeOrder": 1
   },
   {
     "id": "wood-grain-door",
-    "homeFeatured": true,
     "title": "木目ドア補修",
     "category": "ドア補修",
     "date": "",
@@ -85,7 +83,9 @@ window.WORKS_DATA = [
     "beforeImage": "assets/images/works/real/wood-grain-door/before.webp",
     "afterImage": "assets/images/works/real/wood-grain-door/after.webp",
     "imageType": "real",
-    "published": true
+    "published": true,
+    "homeFeatured": true,
+    "homeOrder": 2
   },
   {
     "id": "tile-carpet-replacement",
@@ -103,7 +103,6 @@ window.WORKS_DATA = [
   },
   {
     "id": "cat-scratch-wallpaper",
-    "homeFeatured": true,
     "title": "猫の引っかき傷によるクロス張替え",
     "category": "クロス張替え",
     "date": "",
@@ -114,7 +113,9 @@ window.WORKS_DATA = [
     "beforeImage": "assets/images/works/real/cat-scratch-wallpaper/before.webp",
     "afterImage": "assets/images/works/real/cat-scratch-wallpaper/after.webp",
     "imageType": "real",
-    "published": true
+    "published": true,
+    "homeFeatured": true,
+    "homeOrder": 3
   },
   {
     "id": "screen-replacement",
@@ -128,6 +129,8 @@ window.WORKS_DATA = [
     "beforeImage": "assets/images/works/real/screen-replacement/before.webp",
     "afterImage": "assets/images/works/real/screen-replacement/after.webp",
     "imageType": "real",
-    "published": true
+    "published": true,
+    "homeFeatured": true,
+    "homeOrder": 4
   }
 ];

@@ -110,7 +110,7 @@
     const preview = grid.hasAttribute('data-work-preview');
     const draw = category => {
       const limit = Number.parseInt(grid.dataset.workLimit || '4', 10);
-      const featured = works.filter(work => work.homeFeatured === true);
+      const featured = works.filter(work => work.homeFeatured === true).sort((a, b) => (a.homeOrder || 0) - (b.homeOrder || 0));
       const visible = preview ? (featured.length ? featured : works).slice(0, Number.isFinite(limit) && limit > 0 ? limit : 4) : works;
       const selected = category ? visible.filter(work => work.category === category) : visible;
       grid.replaceChildren(...selected.map(work => renderWork(work, preview)));

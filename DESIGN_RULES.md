@@ -122,3 +122,11 @@
 - legal.html 标题、元数据及全站 footer 改为「事業者情報」，仅保留已确认资料与既有报价说明，不增加代表者、支付条件或法律结论。
 - 首页邮件入口为「お問い合わせページを見る」，Contact 在表单前显示「ウェブフォーム送信機能は準備中」，输入及本机照片预览保留、送信禁用。
 - 六页 OGP 及可见内部上线前提示删除；真实7案例及图片、价格、地址、电话、邮箱、受付時間保持，不显示第三方平台，noindex保留。只更新 PR #1，不改 main、不合并。
+
+
+## 2026-10-09 内装補修与首页精选（用户最新确认）
+
+- 继续 PR #2 分支 fix/mobile-line-home-examples-20261009，不改 main、不合并。
+- 内装補修图片区只用 wallpaper-restoration 与 white-grain-door 两组现有真实 Before/After，以 CSS 网格展示；只加简短案例标题与 Before/After 标签，不生成新图、不裁切、不拉伸、不覆盖占位文案。
+- 首页精选按截图编号固定为 wallpaper-restoration → wood-grain-door → cat-scratch-wallpaper → screen-replacement，共4条。截图编号2对应棕色木目ドア，不改真实照片配对；白木目ドア另用于内装補修服务图。
+- Works 继续保留全部7条；LINE 使用 https://line.me/ti/p/m7O5HD_iVK，保留缓存版本、noindex与表单不发送。
