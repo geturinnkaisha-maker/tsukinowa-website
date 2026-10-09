@@ -86,9 +86,10 @@ const server = http.createServer((req,res) => {
           assert.match(await page.locator('#personal-pricing h3').innerText(),/材工込み/);
         }
         if (file === 'contact.html') {
-          assert.equal(await page.locator('button[type="submit"]').isDisabled(),true);
-          assert.ok(await page.locator('#form-availability').evaluate(note => note.compareDocumentPosition(document.getElementById('name')) & Node.DOCUMENT_POSITION_FOLLOWING));
-          assert.ok(await page.locator('.contact-methods').evaluate(options => options.compareDocumentPosition(document.getElementById('contact-form')) & Node.DOCUMENT_POSITION_FOLLOWING));
+          assert.equal(await page.locator('form, input, textarea, button[type="submit"]').count(),0);
+          assert.equal(await page.locator('script[src*="contact.js"]').count(),0);
+          assert.deepEqual(await page.locator('.contact-methods h3').allTextContents(), ['LINE','お電話','メール']);
+          assert.ok(!/準備中|送信する|お問い合わせ・無料見積り/.test(await page.locator('main').innerText()));
         }
         assert.ok(await page.locator('[data-phone]').evaluateAll(links=>links.every(link=>link.getAttribute('href')==='tel:070-3887-7789')));
         assert.ok(await page.locator('[data-email]').evaluateAll(links=>links.every(link=>link.getAttribute('href')==='mailto:geturinnkaisha@gmail.com')));
@@ -121,21 +122,7 @@ const server = http.createServer((req,res) => {
     await page.waitForFunction(()=>document.getElementById('wood-grain-door'));
     assert.equal(await page.locator('[data-works] .work').count(),7);
     await load('contact.html?service=内装補修');
-    assert.equal(await page.locator('#service').inputValue(),'内装補修');
-    for(const [selector,value] of [['#name','テスト'],['#phone','070-0000-0000'],['#email','test@example.com'],['#area','板橋区'],['#message','ドアの補修を相談したいです。'],['#timing','11月頃']]) await page.locator(selector).fill(value);
-    await page.locator('#photos').setInputFiles('assets/images/works/real/wood-grain-door/before.webp');
-    await page.waitForFunction(()=>document.querySelector('#photo-previews img')?.naturalWidth>0);
-    assert.equal(await page.locator('#photo-previews img').count(),1);
-    assert.equal(await page.locator('button[type="submit"]').isDisabled(),true);
-    const requestCount=requests.length;
-    await page.evaluate(()=>document.querySelector('#contact-form').requestSubmit());
-    assert.equal(requests.length,requestCount);
-    assert.match(await page.locator('#submit-note').innerText(),/送信されません/);
-    await page.locator('#photos').setInputFiles([]);
-    assert.equal(await page.locator('#photo-previews img').count(),0);
-    await page.locator('#photos').setInputFiles({name:'bad.svg',mimeType:'image/svg+xml',buffer:Buffer.from('<svg/>')});
-    assert.equal(await page.locator('#photo-previews img').count(),0);
-    assert.match(await page.locator('#photo-status').innerText(),/JPEG/);
+    assert.equal(await page.locator('form, input, textarea').count(),0);
     assert.equal(await page.locator('[data-line-direct]').isVisible(),false);
     await page.setViewportSize({width:1440,height:900});
     assert.equal(await page.locator('[data-line-qr]').isVisible(),true);
@@ -199,7 +186,7 @@ const server = http.createServer((req,res) => {
     await page.unroute('**/assets/js/works-data.js*');
     await page.route('**/assets/js/services-data.js*',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('assets/js/services-data.js','utf8')+'window.SERVICES_DATA.push({title:"内装デザイン",description:"テスト用追加サービス"});'}));
     await load('index.html');assert.equal(await page.locator('[data-services] .service-row').count(),5);
-    await load('contact.html?service=内装デザイン');assert.equal(await page.locator('#service').inputValue(),'内装デザイン');
+    await load('contact.html?service=内装デザイン');assert.equal(await page.locator('form, input, textarea').count(),0);
     assert.equal(requests.filter(request=>request.method!=='GET').length,0);
     assert.ok(requests.some(request=>request.url.includes('/assets/images/line/line-qr.png')));
     assert.deepEqual(await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length})),{local:0,session:0});

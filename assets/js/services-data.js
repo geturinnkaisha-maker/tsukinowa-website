@@ -21,7 +21,7 @@ window.SERVICES_DATA = [
   },
   {
     "title": "原状回復",
-    "description": "賃貸物件の退去後工事に。クロス・床・部分補修を、必要な内容に合わせてご相談いただけます。",
+    "description": "賃貸物件の退去後工事に。クロス・床・部分補修など、必要な工事内容に合わせて対応します。",
     "image": "assets/images/illustrations/services/restoration-v3.webp",
     "alt": "原状回復の室内イメージ。",
     "caption": ""
